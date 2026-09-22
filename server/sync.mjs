@@ -10,7 +10,7 @@ import { extractPhotos, fetchAllZoneRecords, resolvePublicShare } from './icloud
 
 const execFileAsync = promisify(execFile);
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
-const RENDER_VERSION = 'voyage-1072x1448-gray-face-aware-v4';
+const RENDER_VERSION = 'voyage-1072x1448-gray-face-edge-fill-v5';
 const MAX_SOURCE_BYTES = 100 * 1024 * 1024;
 
 async function atomicWrite(path, contents, mode = 0o644) {

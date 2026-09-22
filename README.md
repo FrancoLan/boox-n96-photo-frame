@@ -8,7 +8,7 @@ The Mac companion downloads the shared album, reverse-geocodes photo coordinates
 
 - Runs on the original BOOX N96 firmware: Android 4.0.4 / API 15.
 - Uses the same public iCloud Shared Album on every display.
-- Face-aware portrait framing. Wide group photos fall back to full-image display instead of cutting off people.
+- Face-aware portrait framing. Wide group photos fall back to full-image display instead of cutting off people; unused areas use darkened colors sampled from the adjacent photo edges, with black as the fallback.
 - Location and local capture time are rendered into the lower-right corner.
 - Offline cache, boot start, physical page keys, touch navigation, and automatic stale-cache cleanup.
 - Restricted wireless controls without wireless ADB or a remote shell.
@@ -109,6 +109,8 @@ The renderer uses macOS Vision and Core Image face detection. If an unusually an
 ```
 
 After synchronization, the BOOX removes cached renderings that are no longer in the current manifest.
+
+Shared photo-frame behavior is kept in parity with the Kindle Voyage edition. Any intentional user-visible divergence must be approved explicitly; see [Cross-device parity](docs/CROSS_DEVICE_PARITY.md).
 
 ## Security model
 

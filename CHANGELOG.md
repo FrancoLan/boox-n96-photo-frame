@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 — 2026-09-23
+
+- Replaced white full-image margins with darkened colors sampled from the adjacent photo edges; black remains the fallback.
+- Kept face-priority and full-image fallback behavior aligned with the Kindle Voyage edition.
+- Added an explicit cross-device parity policy for future changes.
+
 ## 1.1.2 — 2026-09-22
 
 - Added face-aware framing on the Mac renderer.

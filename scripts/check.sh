@@ -11,6 +11,7 @@ node --check server/sync.mjs
 node --check server/server.mjs
 node --check server/manage-boox.mjs
 jq empty server/config.example.json
+./scripts/test-orientation-pipeline.sh
 
 matches=$(rg -n --hidden -S \
     '(photos\.icloud\.com/shared/album/|/Users/[^/]+/|0123456789ABCDEF|BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY|[0-9a-f]{64})' \

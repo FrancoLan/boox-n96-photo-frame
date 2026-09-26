@@ -1,5 +1,9 @@
 # BOOX N96 相框交接手册
 
+## 2026-09-27 修复照片方向回归（已验证渲染；设备清单重发待完成）
+
+此前 v9 同步器先用 `sips -r` 按 EXIF 旋转像素，而元数据渲染器的 ImageIO 解码又启用了 EXIF transform，造成部分竖图被旋转两次。现统一为 ImageIO 在 `metadata-overlay` 中单次归一化，移除同步器的额外旋转，并将缓存版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-orientation-once-v10`。EXIF Orientation 6 与 8 的两张本地实拍已在修复版下成功渲染为 1072×1448；两仓库 `./scripts/check.sh` 均通过，并新增防双重旋转检查。Mac 正式运行目录已部署 v10 渲染器并保留回滚备份。首次正式同步遇到 iCloud `fetch failed`，因此线上 manifest 暂仍为 v9 (`4c78d24e6f4712b6`)，不能确认 Kindle/BOOX 已收到修正后的照片；待同步成功后补记 manifest 与设备回执。
+
 ## 2026-09-27 暗部直方图自适应提亮（已部署）
 
 Mac 共用照片渲染器现在在添加元数据前统计源照片灰度直方图。仅当亮度中位数低于 40/255 且 P95 不低于 80/255 时，应用温和的阴影提亮曲线；保留纯黑与白场，并避免把接近全黑的画面整体抬灰。正常曝光和 2024-11-17 01:10 参考照不触发。渲染版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-v9`，下次服务端同步会重建缓存中的所有照片，Kindle/BOOX 仍共享同一批渲染图。环境变量 `PHOTOFRAME_DEBUG_TONE=1` 可输出 P5/P50/P95 与是否应用曲线。

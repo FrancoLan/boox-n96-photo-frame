@@ -2,7 +2,7 @@
 
 ## 2026-09-27 修复照片方向回归（已验证渲染；设备清单重发待完成）
 
-此前 v9 同步器先用 `sips -r` 按 EXIF 旋转像素，而元数据渲染器的 ImageIO 解码又启用了 EXIF transform，造成部分竖图被旋转两次。现统一为 ImageIO 在 `metadata-overlay` 中单次归一化，移除同步器的额外旋转，并将缓存版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-orientation-once-v10`。EXIF Orientation 6 与 8 的两张本地实拍已在修复版下成功渲染为 1072×1448；两仓库 `./scripts/check.sh` 均通过，并新增防双重旋转检查。Mac 正式运行目录已部署 v10 渲染器并保留回滚备份。首次正式同步遇到 iCloud `fetch failed`，因此线上 manifest 暂仍为 v9 (`4c78d24e6f4712b6`)，不能确认 Kindle/BOOX 已收到修正后的照片；待同步成功后补记 manifest 与设备回执。
+此前 v9 同步器先用 `sips -r` 按 EXIF 旋转像素，而元数据渲染器的 ImageIO 解码又启用了 EXIF transform，造成部分竖图被旋转两次。现统一为 ImageIO 在 `metadata-overlay` 中单次归一化，移除同步器的额外旋转，并将缓存版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-orientation-once-v10`。EXIF Orientation 6 与 8 的两张本地实拍已在修复版下成功渲染为 1072×1448；两仓库 `./scripts/check.sh` 均通过，并新增防双重旋转检查。Mac 正式运行目录已部署 v10 渲染器并保留回滚备份。正式同步现已发布 44 张，manifest `ebb68e6254cfa084`；BOOX `sync` 命令 `86941956-1e7b-41e4-8c36-7c46db6b9a16` 成功回执、cache=44。Kindle `restart` 命令 `86bf61c0-c7fd-4fab-a23a-5edf97829942` 已发出，但设备心跳在 2026-09-26 14:41:22 UTC 后中断，局域网 ping 无响应，尚不能确认 Kindle 已拉取 v10。GitHub 修复提交 `9dd97ee` 已推送至 BOOX 仓库 `main`。
 
 ## 2026-09-27 暗部直方图自适应提亮（已部署）
 

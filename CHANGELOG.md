@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3 — 2026-09-26
+
+- Apply JPEG EXIF rotation in the shared Mac renderer so portrait images remain upright on BOOX and Kindle.
+
 ## 1.2.2 — 2026-09-26
 
 - Check for new shared-album photos every minute while the photo frame is open, independently of the slideshow interval.

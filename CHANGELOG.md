@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 — 2026-09-26
+
+- Play newly synchronized photos immediately, then resume the existing playlist sequence.
+
 ## 1.2.0 — 2026-09-23
 
 - Replaced white full-image margins with darkened colors sampled from the adjacent photo edges; black remains the fallback.

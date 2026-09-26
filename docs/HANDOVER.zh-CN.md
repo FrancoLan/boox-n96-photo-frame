@@ -1,10 +1,10 @@
 # BOOX N96 相框交接手册
 
-## 2026-09-27 暗部直方图自适应提亮（源码已实现，尚未部署）
+## 2026-09-27 暗部直方图自适应提亮（已部署）
 
 Mac 共用照片渲染器现在在添加元数据前统计源照片灰度直方图。仅当亮度中位数低于 40/255 且 P95 不低于 80/255 时，应用温和的阴影提亮曲线；保留纯黑与白场，并避免把接近全黑的画面整体抬灰。正常曝光和 2024-11-17 01:10 参考照不触发。渲染版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-v9`，下次服务端同步会重建缓存中的所有照片，Kindle/BOOX 仍共享同一批渲染图。环境变量 `PHOTOFRAME_DEBUG_TONE=1` 可输出 P5/P50/P95 与是否应用曲线。
 
-两个独立仓库的 `./scripts/check.sh` 已通过，含曲线阈值测试；用暗调样片实跑渲染得到 1072×1448 PNG，确认触发提亮。Kindle GitHub `64876ba`、BOOX GitHub `de68d5b` 已推送到 `main`。**当前仅源码和文档更新，尚未部署到 Mac 正式运行服务，也没有设备端实屏验收。**
+两个独立仓库的 `./scripts/check.sh` 已通过，含曲线阈值测试；用暗调样片实跑渲染得到 1072×1448 PNG，确认触发提亮。Kindle GitHub `64876ba`、BOOX GitHub `de68d5b` 已推送到 `main`。随后已备份正式服务原始渲染器并部署新版本到 `~/Library/Application Support/KindlePhotoframe/runtime/`，Mac 服务保持运行。正式同步成功重新渲染并发布 44 张，manifest `4c78d24e6f4712b6`，renderer v9。BOOX `sync` 命令 `931da6be-43fc-4a77-afff-3098ce31b484` 已回报成功、cache=44；Kindle `restart` 命令 `a6a4c297-8164-4bad-bf80-f8d534ae2c3e` 已回报成功，两端仍运行。墨水屏上的最终观感待用户目视确认。此次部署交接记录已更新，GitHub 记录待推送。
 
 ## 2026-09-26 MapKit 弃用 API 清理
 

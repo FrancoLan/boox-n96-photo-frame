@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Apply the shared Mac renderer's gentle shadow lift only to distinctly dark photos; preserve black points and highlights and leave normally exposed photos unchanged.
-- Bump the renderer cache version so existing photos are regenerated for BOOX and Kindle on the next Mac sync.
+- Deployed to the Mac renderer on 2026-09-27; regenerated and published all 44 shared photos as manifest `4c78d24e6f4712b6` for BOOX and Kindle.
 
 ## 1.2.3 — 2026-09-26
 

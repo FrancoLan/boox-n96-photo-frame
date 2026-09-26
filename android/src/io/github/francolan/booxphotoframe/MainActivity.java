@@ -54,21 +54,24 @@ public final class MainActivity extends Activity {
     private final Handler handler = new Handler();
     private final Random random = new Random();
     private final ArrayList<File> playlist = new ArrayList<File>();
+    private final ArrayList<File> normalPlaylist = new ArrayList<File>();
     private FrameView frameView;
     private File rootDir;
     private File cacheDir;
     private int currentIndex = -1;
+    private int resumeIndex;
     private long minIntervalMs = DEFAULT_MIN_INTERVAL_MS;
     private long maxIntervalMs = DEFAULT_MAX_INTERVAL_MS;
     private long lastSyncAt;
     private boolean active;
     private boolean syncing;
+    private boolean priorityActive;
     private BroadcastReceiver controlReceiver;
 
     private final Runnable advanceRunnable = new Runnable() {
         public void run() {
             if (!active) return;
-            showRelative(1);
+            advance();
             if (System.currentTimeMillis() - lastSyncAt >= RESYNC_INTERVAL_MS) syncInBackground();
             scheduleNext();
         }
@@ -94,10 +97,10 @@ public final class MainActivity extends Activity {
         controlReceiver = new BroadcastReceiver() {
             @Override public void onReceive(Context context, Intent intent) {
                 String command = intent.getStringExtra("command");
-                if ("next".equals(command)) { showRelative(1); scheduleNext(); }
+                if ("next".equals(command)) { advance(); scheduleNext(); }
                 else if ("previous".equals(command)) { showRelative(-1); scheduleNext(); }
                 else if ("sync".equals(command)) syncInBackground();
-                else if ("restart".equals(command)) { loadCachedPlaylist(); showRelative(1); syncInBackground(); scheduleNext(); }
+                else if ("restart".equals(command)) { priorityActive = false; normalPlaylist.clear(); currentIndex = -1; loadCachedPlaylist(); showRelative(1); syncInBackground(); scheduleNext(); }
                 else if ("disable".equals(command)) finish();
             }
         };
@@ -178,21 +181,58 @@ public final class MainActivity extends Activity {
         hideSystemUi();
     }
 
+    private synchronized void advance() {
+        if (priorityActive && currentIndex + 1 >= playlist.size()) {
+            playlist.clear();
+            playlist.addAll(normalPlaylist);
+            normalPlaylist.clear();
+            priorityActive = false;
+            currentIndex = resumeIndex - 1;
+        }
+        showRelative(1);
+    }
+
+    private synchronized File currentImage() {
+        return currentIndex >= 0 && currentIndex < playlist.size() ? playlist.get(currentIndex) : null;
+    }
+
     private void syncInBackground() {
         synchronized (this) {
             if (syncing) return;
             syncing = true;
         }
+        final File interrupted = currentImage();
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    syncPhotos();
+                    final ArrayList<File> addedPhotos = syncPhotos();
                     lastSyncAt = System.currentTimeMillis();
                     handler.post(new Runnable() {
                         public void run() {
-                            boolean wasEmpty = playlist.isEmpty();
                             loadCachedPlaylist();
-                            if (wasEmpty && !playlist.isEmpty()) showRelative(1);
+                            if (!addedPhotos.isEmpty()) {
+                                normalPlaylist.clear();
+                                normalPlaylist.addAll(playlist);
+                                int interruptedIndex = normalPlaylist.indexOf(interrupted);
+                                resumeIndex = interruptedIndex >= 0
+                                        ? (interruptedIndex + 1) % normalPlaylist.size() : 0;
+                                playlist.clear();
+                                for (int i = 0; i < addedPhotos.size(); i++) {
+                                    if (normalPlaylist.contains(addedPhotos.get(i))) playlist.add(addedPhotos.get(i));
+                                }
+                                currentIndex = -1;
+                                priorityActive = !playlist.isEmpty();
+                                if (priorityActive) {
+                                    showRelative(1);
+                                    scheduleNext();
+                                }
+                            } else if (interrupted != null && playlist.contains(interrupted)) {
+                                currentIndex = playlist.indexOf(interrupted);
+                            } else if (!playlist.isEmpty()) {
+                                currentIndex = -1;
+                                showRelative(1);
+                                scheduleNext();
+                            }
                         }
                     });
                 } catch (Exception error) {
@@ -204,7 +244,7 @@ public final class MainActivity extends Activity {
         }, "boox-photo-sync").start();
     }
 
-    private void syncPhotos() throws Exception {
+    private ArrayList<File> syncPhotos() throws Exception {
         Map<String, String> config = readConfig();
         String server = config.get("server_url");
         String token = config.get("auth_token");
@@ -219,6 +259,7 @@ public final class MainActivity extends Activity {
             throw new Exception("Invalid manifest");
         }
         HashSet<String> expectedFiles = new HashSet<String>();
+        ArrayList<File> addedPhotos = new ArrayList<File>();
         for (int i = 1; i < lines.length; i++) {
             if (lines[i].length() == 0) continue;
             String[] fields = lines[i].split("\\t");
@@ -229,12 +270,14 @@ public final class MainActivity extends Activity {
             if (!fields[2].equals("/v1/images/" + fields[0] + ".png")) throw new Exception("Invalid image path");
             File target = new File(cacheDir, fields[0] + ".png");
             if (target.isFile() && target.length() == expectedSize && fields[0].equals(sha256(target))) continue;
+            boolean newlyAdded = !target.isFile();
             byte[] image = request(server + fields[2], token, MAX_IMAGE_BYTES);
             if (image.length != expectedSize || !fields[0].equals(sha256(image))) throw new Exception("Image checksum mismatch");
             File temporary = new File(cacheDir, fields[0] + ".download");
             FileOutputStream output = new FileOutputStream(temporary);
             try { output.write(image); output.getFD().sync(); } finally { output.close(); }
             if (!temporary.renameTo(target)) throw new Exception("Unable to publish cached image");
+            if (newlyAdded) addedPhotos.add(target);
         }
         File[] cachedFiles = cacheDir.listFiles();
         if (cachedFiles != null) {
@@ -245,6 +288,7 @@ public final class MainActivity extends Activity {
                 }
             }
         }
+        return addedPhotos;
     }
 
     private Map<String, String> readConfig() {

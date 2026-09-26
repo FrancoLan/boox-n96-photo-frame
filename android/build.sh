@@ -7,6 +7,7 @@ BUILD_TOOLS="$SDK_ROOT/build-tools/36.0.0"
 ANDROID_JAR="$SDK_ROOT/platforms/android-36/android.jar"
 BUILD_DIR="$SCRIPT_DIR/build"
 CLASSES_DIR="$BUILD_DIR/classes"
+SIGNING_KEYSTORE=${BOOX_SIGNING_KEYSTORE:-$BUILD_DIR/debug.keystore}
 
 rm -rf "$CLASSES_DIR" "$BUILD_DIR/dex" "$BUILD_DIR/classes.jar"
 mkdir -p "$CLASSES_DIR" "$BUILD_DIR/dex"
@@ -27,13 +28,17 @@ jar cf "$BUILD_DIR/classes.jar" -C "$CLASSES_DIR" .
 )
 "$BUILD_TOOLS/zipalign" -f 4 "$BUILD_DIR/boox-photoframe-unsigned.apk" "$BUILD_DIR/boox-photoframe-aligned.apk"
 
-if [ ! -f "$BUILD_DIR/debug.keystore" ]; then
-    keytool -genkeypair -keystore "$BUILD_DIR/debug.keystore" -storepass android \
+if [ ! -f "$SIGNING_KEYSTORE" ]; then
+    if [ -n "${BOOX_SIGNING_KEYSTORE:-}" ]; then
+        echo "Configured BOOX_SIGNING_KEYSTORE does not exist: $SIGNING_KEYSTORE" >&2
+        exit 1
+    fi
+    keytool -genkeypair -keystore "$SIGNING_KEYSTORE" -storepass android \
         -alias androiddebugkey -keypass android -dname "CN=BOOX Photoframe Debug,O=Local" \
         -keyalg RSA -keysize 2048 -validity 10000 >/dev/null 2>&1
 fi
 "$BUILD_TOOLS/apksigner" sign --min-sdk-version 15 \
-    --ks "$BUILD_DIR/debug.keystore" --ks-pass pass:android --key-pass pass:android \
+    --ks "$SIGNING_KEYSTORE" --ks-pass pass:android --key-pass pass:android \
     --out "$BUILD_DIR/boox-photoframe.apk" "$BUILD_DIR/boox-photoframe-aligned.apk"
 "$BUILD_TOOLS/apksigner" verify --verbose "$BUILD_DIR/boox-photoframe.apk"
 echo "$BUILD_DIR/boox-photoframe.apk"

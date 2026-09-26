@@ -4,7 +4,7 @@
 
 这套系统由 Mac 服务端和 BOOX N96 客户端组成。Mac 每 10 分钟读取同一个 iCloud 共享相册，生成适合 1072×1448 墨水屏的灰度图片；BOOX 在局域网内同步并离线轮播。
 
-1.2.1 更新已构建并下发，包含新照片优先播放逻辑，并将 Android `versionCode` 升至 8，以确保高于设备当前的 1.2.0。`./scripts/check.sh` 通过；安装命令 `d40024de-a8de-4e14-8b83-6fac5dffaea0` 的 APK 已验证，等待设备端 Android 安装确认。此前相同版本的 APK 被设备报告“未安装”。BOOX 需要在屏幕上确认安装，Mac 的 ADB 当前未发现 BOOX；安装后再核对设备版本与播放行为。
+1.2.1 更新已构建并下发，包含新照片优先播放逻辑，Android `versionCode` 为 8。最初的 APK 因用了错误签名密钥，被设备报告“已安装了存在签名冲突的同名数据包”。改用此前 BOOX 包的匹配签名（SHA-256 `ae3483dd5896df8c0f7fd4a327a0ada698abab50a8b03fb250dde1a9ffe7c988`）重签后，`./scripts/check.sh` 与 APK 签名校验均通过。匹配签名的新安装命令 `94f6db1c-4b6b-47bf-90d0-6872895e06ef` 已下发，等待设备端完成安装；Mac 的 ADB 当前未发现 BOOX，之后须核对 appVersion 与新播放行为。构建时设置 `BOOX_SIGNING_KEYSTORE` 指向原有本地 keystore；不可提交或重新生成该密钥。
 
 主要行为：
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Apply the shared Mac renderer's gentle shadow lift only to distinctly dark photos; preserve black points and highlights and leave normally exposed photos unchanged.
+- Bump the renderer cache version so existing photos are regenerated for BOOX and Kindle on the next Mac sync.
+
 ## 1.2.3 — 2026-09-26
 
 - Apply JPEG EXIF rotation in the shared Mac renderer so portrait images remain upright on BOOX and Kindle.

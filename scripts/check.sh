@@ -23,5 +23,6 @@ if [ -n "$matches" ]; then
 fi
 
 ./scripts/build-mac-tools.sh
+./server/metadata-overlay --tone-tests
 ./android/build.sh
 echo "Checks passed."

@@ -1,5 +1,11 @@
 # BOOX N96 相框交接手册
 
+## 2026-09-27 暗部直方图自适应提亮（源码已实现，尚未部署）
+
+Mac 共用照片渲染器现在在添加元数据前统计源照片灰度直方图。仅当亮度中位数低于 40/255 且 P95 不低于 80/255 时，应用温和的阴影提亮曲线；保留纯黑与白场，并避免把接近全黑的画面整体抬灰。正常曝光和 2024-11-17 01:10 参考照不触发。渲染版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-v9`，下次服务端同步会重建缓存中的所有照片，Kindle/BOOX 仍共享同一批渲染图。环境变量 `PHOTOFRAME_DEBUG_TONE=1` 可输出 P5/P50/P95 与是否应用曲线。
+
+两个独立仓库的 `./scripts/check.sh` 已通过，含曲线阈值测试；用暗调样片实跑渲染得到 1072×1448 PNG，确认触发提亮。**当前仅源码和文档更新，尚未部署到 Mac 正式运行服务，也没有设备端实屏验收。**
+
 ## 2026-09-26 MapKit 弃用 API 清理
 
 Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresentations`：优先展示完整格式地址（可包含街道、城区和城市），不可用时回退到城市名；地址和拍摄时间分两行，日期后加英文缩写星期，例如 `2026-09-25 Fri 20:01`，日期时间使用不可断空格。44 张图已发布为 manifest `879a25fc0cd39bec`（render v8）。BOOX `sync` 命令 `1be92472-ff35-4300-b3e2-9b0b4791b69e` 成功，设备回报 cache=50。Kindle `restart` 命令 `1951a842-f593-4c51-b08b-5bc90edb378f` 仍待设备确认，最后收到其 `running` heartbeat 为 13:25:41 UTC。`./scripts/check.sh` 完整检查通过。

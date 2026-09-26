@@ -2,7 +2,7 @@
 
 ## 2026-09-26 MapKit 弃用 API 清理
 
-Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresentations`：优先展示完整格式地址（可包含街道、城区和城市），不可用时回退到城市名；长地点标签换行显示。缓存与渲染版本升级后，44 张图已重新发布为 manifest `a43b556e34f3300e`。BOOX `sync` 命令 `9db380f9-91f6-4086-a751-59a20969efbf` 成功，设备回报 cache=44；Kindle `restart` 命令 `fd94bc9e-5e45-4d9f-bada-34cbf18055b8` 成功，相框仍在运行。新接口不再触发 macOS 26 的 placemark 弃用警告。`./scripts/check.sh` 完整检查通过。
+Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresentations`：优先展示完整格式地址（可包含街道、城区和城市），不可用时回退到城市名；地址和拍摄时间分两行，日期后加英文缩写星期，例如 `2026-09-25 Fri 20:01`，日期时间使用不可断空格。44 张图已发布为 manifest `879a25fc0cd39bec`（render v8）。BOOX `sync` 命令 `1be92472-ff35-4300-b3e2-9b0b4791b69e` 成功，设备回报 cache=50；Kindle `restart` 命令 `1951a842-f593-4c51-b08b-5bc90edb378f` 已下发，相框仍在运行。`./scripts/check.sh` 完整检查通过。
 
 ## 当前能力
 

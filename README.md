@@ -9,7 +9,7 @@ The Mac companion downloads the shared album, reverse-geocodes photo coordinates
 - Runs on the original BOOX N96 firmware: Android 4.0.4 / API 15.
 - Uses the same public iCloud Shared Album on every display.
 - Face-aware portrait framing. Wide group photos fall back to full-image display instead of cutting off people; unused areas use darkened colors sampled from the adjacent photo edges, with black as the fallback.
-- The fullest available formatted address and local capture time are rendered into the lower-right corner; long labels wrap instead of dropping the address prefix.
+- The fullest available formatted address and local capture time are rendered into the lower-right corner on separate lines; the date includes an abbreviated weekday, and the timestamp stays intact.
 - Offline cache, boot start, physical page keys, touch navigation, and automatic stale-cache cleanup.
 - Restricted wireless controls without wireless ADB or a remote shell.
 - APK downloads are length-checked and SHA-256 verified before Android's installer asks for local confirmation.

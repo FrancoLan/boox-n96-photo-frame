@@ -47,7 +47,7 @@ public final class MainActivity extends Activity {
             View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
     private static final long DEFAULT_MIN_INTERVAL_MS = 600000L;
     private static final long DEFAULT_MAX_INTERVAL_MS = 1200000L;
-    private static final long RESYNC_INTERVAL_MS = 3600000L;
+    private static final long RESYNC_INTERVAL_MS = 60000L;
     private static final int MAX_MANIFEST_BYTES = 1024 * 1024;
     private static final int MAX_IMAGE_BYTES = 25 * 1024 * 1024;
 
@@ -72,8 +72,15 @@ public final class MainActivity extends Activity {
         public void run() {
             if (!active) return;
             advance();
-            if (System.currentTimeMillis() - lastSyncAt >= RESYNC_INTERVAL_MS) syncInBackground();
             scheduleNext();
+        }
+    };
+
+    private final Runnable syncRunnable = new Runnable() {
+        public void run() {
+            if (!active) return;
+            if (System.currentTimeMillis() - lastSyncAt >= RESYNC_INTERVAL_MS) syncInBackground();
+            handler.postDelayed(this, RESYNC_INTERVAL_MS);
         }
     };
 
@@ -116,6 +123,8 @@ public final class MainActivity extends Activity {
         active = true;
         hideSystemUi();
         syncInBackground();
+        handler.removeCallbacks(syncRunnable);
+        handler.postDelayed(syncRunnable, RESYNC_INTERVAL_MS);
         scheduleNext();
     }
 
@@ -123,6 +132,7 @@ public final class MainActivity extends Activity {
         visible = false;
         active = false;
         handler.removeCallbacks(advanceRunnable);
+        handler.removeCallbacks(syncRunnable);
         super.onPause();
     }
 

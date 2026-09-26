@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 public final class ControlService extends Service {
-    private static final String VERSION = "1.2.1";
+    private static final String VERSION = "1.2.2";
     private static final long POLL_MS = 60000L;
     private static final long HEARTBEAT_MS = 300000L;
     private static final int MAX_COMMAND_BYTES = 16 * 1024;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2 — 2026-09-26
+
+- Check for new shared-album photos every minute while the photo frame is open, independently of the slideshow interval.
+
 ## 1.2.1 — 2026-09-26
 
 - Play newly synchronized photos immediately, then resume the existing playlist sequence.

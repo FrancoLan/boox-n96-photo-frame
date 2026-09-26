@@ -1,5 +1,9 @@
 # BOOX N96 相框交接手册
 
+## 2026-09-26 MapKit 弃用 API 清理
+
+Mac 端 `server/reverse-geocode.swift` 已从弃用的 `MKMapItem.placemark` 字段迁移到 `MKMapItem.addressRepresentations.cityName`，避免 macOS 26 的 placemark 弃用警告。`./scripts/check.sh` 完整检查通过。
+
 ## 当前能力
 
 这套系统由 Mac 服务端和 BOOX N96 客户端组成。Mac 每 10 分钟读取同一个 iCloud 共享相册，生成适合 1072×1448 墨水屏的灰度图片；BOOX 在局域网内同步并离线轮播。

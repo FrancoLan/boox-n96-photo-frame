@@ -2,7 +2,7 @@
 
 ## 2026-09-26 MapKit 弃用 API 清理
 
-Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresentations`：优先展示完整格式地址（可包含街道、城区和城市），不可用时回退到城市名；地址和拍摄时间分两行，日期后加英文缩写星期，例如 `2026-09-25 Fri 20:01`，日期时间使用不可断空格。44 张图已发布为 manifest `879a25fc0cd39bec`（render v8）。BOOX `sync` 命令 `1be92472-ff35-4300-b3e2-9b0b4791b69e` 成功，设备回报 cache=50；Kindle `restart` 命令 `1951a842-f593-4c51-b08b-5bc90edb378f` 已下发，相框仍在运行。`./scripts/check.sh` 完整检查通过。
+Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresentations`：优先展示完整格式地址（可包含街道、城区和城市），不可用时回退到城市名；地址和拍摄时间分两行，日期后加英文缩写星期，例如 `2026-09-25 Fri 20:01`，日期时间使用不可断空格。44 张图已发布为 manifest `879a25fc0cd39bec`（render v8）。BOOX `sync` 命令 `1be92472-ff35-4300-b3e2-9b0b4791b69e` 成功，设备回报 cache=50。Kindle `restart` 命令 `1951a842-f593-4c51-b08b-5bc90edb378f` 仍待设备确认，最后收到其 `running` heartbeat 为 13:25:41 UTC。`./scripts/check.sh` 完整检查通过。
 
 ## 当前能力
 

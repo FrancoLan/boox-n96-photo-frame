@@ -1,14 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.2.4 — 2026-09-28
 
-- Prevent portrait-photo orientation regressions by applying EXIF orientation once in ImageIO; remove the redundant pre-rotation step and invalidate v9 render caches.
-- Add a pipeline regression check that rejects double rotation.
-
-## Unreleased
-
-- Apply the shared Mac renderer's gentle shadow lift only to distinctly dark photos; preserve black points and highlights and leave normally exposed photos unchanged.
-- Deployed to the Mac renderer on 2026-09-27; regenerated and published all 44 shared photos as manifest `4c78d24e6f4712b6` for BOOX and Kindle.
+- Play newly synchronized photos immediately and check shared albums every minute.
+- Keep portrait photos upright with a single EXIF orientation transform; add a regression check against double rotation.
+- Improve photo captions with fuller location addresses and weekday labels; apply a restrained shadow lift only to very dark photos.
+- The BOOX Android client remains at 1.2.2; this release covers the shared Mac sync and rendering pipeline.
 
 ## 1.2.3 — 2026-09-26
 

@@ -1,5 +1,13 @@
 # BOOX N96 相框交接手册
 
+## 2026-09-28 换图深度刷新（APK 1.2.3，真机已验证）
+
+- 按用户要求，每次照片切换绘制完成后约 100 ms 请求一次全屏深度刷新；首次展示和回到前台也刷新。自动轮播、新照片优先队列、管理命令及按键/触摸共用同一绘制路径。快速连续切图会取消上一张尚未执行的刷新，暂停或 View 脱离窗口时取消回调。
+- N96 Android 4.0.4 / API 15 的固件提供公开但不在标准 Android SDK 内的 `View.fullRefreshScreen()`；通过反射调用，底层进入 `ViewRootImpl.fullRefreshScreen()`。无需额外 Onyx SDK。固件缺少接口或调用失败时保留照片展示并输出 `BooxFullRefresh` 警告。
+- APK 版本为 `1.2.3` / `versionCode=10`；完整 `./scripts/check.sh` 与 APK 签名校验通过。已通过 USB 覆盖安装，确认版本和前台 Activity，并测试下一张、上一张、方向键与离开/返回相框。日志确认全屏刷新调用成功；用户明确确认「一样，残影也清除了」，即与右上实体设置键效果相同。
+- 本次是真机验收安装，源码位于 `feat/boox-full-refresh-on-photo-change`，通过 PR 归入 `main`；未创建 Release。Kindle 保留已确认的手动快速切图后 10 秒补全刷策略；这是本次 BOOX 专项要求，见 `CROSS_DEVICE_PARITY.md`。
+- **签名注意**：本工作区 BOOX 仓库默认的 `android/build/debug.keystore` 与设备安装版不匹配。本次使用聚合工作区 `implementation/boox/build/debug.keystore`（通过 `BOOX_SIGNING_KEYSTORE` 指定），证书与安装包匹配。切勿依赖新生成的默认调试密钥覆盖升级；先比对安装包与待安装 APK 的 signer。旧 APK 已在本机临时目录保留作诊断副本。
+
 ## 2026-09-28 Git 工作流约定
 
 - `main` 是可部署和发布分支，不直接在其上开发。所有改动（包括文档）都使用短期 `fix/*`、`feat/*` 或 `chore/*` 分支，通过 PR 合并。
@@ -90,7 +98,7 @@ Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresenta
 ./scripts/install-android.sh
 ```
 
-安装脚本会构建 APK、写入服务器地址与令牌、推送配置并启动相框。签名密钥位于被忽略的 `android/build/debug.keystore`；不要把它提交到 GitHub。
+安装脚本会构建 APK、写入服务器地址与令牌、推送配置并启动相框。升级前用 `BOOX_SIGNING_KEYSTORE` 指定与已安装 APK 证书匹配的原始私有密钥；默认 `android/build/debug.keystore` 仅用于本地构建，不能假定与设备一致。不要把密钥提交到 GitHub。
 
 ## 故障排查
 

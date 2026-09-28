@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,6 +32,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,6 +124,7 @@ public final class MainActivity extends Activity {
         visible = true;
         active = true;
         hideSystemUi();
+        frameView.requestPhotoRefresh();
         syncInBackground();
         handler.removeCallbacks(syncRunnable);
         handler.postDelayed(syncRunnable, RESYNC_INTERVAL_MS);
@@ -131,6 +134,7 @@ public final class MainActivity extends Activity {
     @Override protected void onPause() {
         visible = false;
         active = false;
+        frameView.cancelPhotoRefresh();
         handler.removeCallbacks(advanceRunnable);
         handler.removeCallbacks(syncRunnable);
         super.onPause();
@@ -418,13 +422,54 @@ public final class MainActivity extends Activity {
         private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG);
         private Bitmap bitmap;
         private float downX;
+        private Method fullRefreshMethod;
+        private boolean refreshAfterDraw;
+        private final Runnable fullRefresh = new Runnable() {
+            public void run() {
+                if (!active || getWindowToken() == null || fullRefreshMethod == null) return;
+                try {
+                    fullRefreshMethod.invoke(FrameView.this);
+                    Log.i("BooxFullRefresh", "Photo full-screen refresh requested");
+                } catch (Exception error) {
+                    // Keep photos usable if another firmware does not support this hook.
+                    fullRefreshMethod = null;
+                    Log.w("BooxFullRefresh", "Full-screen refresh unavailable", error);
+                }
+            }
+        };
 
-        FrameView() { super(MainActivity.this); setBackgroundColor(Color.WHITE); }
+        FrameView() {
+            super(MainActivity.this);
+            setBackgroundColor(Color.WHITE);
+            try {
+                // N96 Android 4.0.4 exposes this public vendor method on View.
+                // It calls ViewRootImpl.fullRefreshScreen(), the firmware full refresh.
+                fullRefreshMethod = View.class.getMethod("fullRefreshScreen");
+            } catch (Exception error) {
+                Log.w("BooxFullRefresh", "Firmware has no full-screen refresh hook", error);
+            }
+        }
+
+        void requestPhotoRefresh() {
+            removeCallbacks(fullRefresh);
+            refreshAfterDraw = bitmap != null && fullRefreshMethod != null;
+            invalidate();
+        }
+
+        void cancelPhotoRefresh() {
+            removeCallbacks(fullRefresh);
+            refreshAfterDraw = false;
+        }
+
+        @Override protected void onDetachedFromWindow() {
+            cancelPhotoRefresh();
+            super.onDetachedFromWindow();
+        }
 
         void setBitmap(Bitmap next) {
             Bitmap previous = bitmap;
             bitmap = next;
-            invalidate();
+            requestPhotoRefresh();
             if (previous != null && previous != next) previous.recycle();
         }
 
@@ -441,6 +486,12 @@ public final class MainActivity extends Activity {
             canvas.scale(scale, scale);
             canvas.drawBitmap(bitmap, 0, 0, paint);
             canvas.restore();
+            if (refreshAfterDraw && active) {
+                refreshAfterDraw = false;
+                // Let this drawing traversal reach the framebuffer before its full refresh.
+                // A newer photo or pause cancels this callback, avoiding stale/repeated flashes.
+                postDelayed(fullRefresh, 100L);
+            }
         }
 
         @Override public boolean onTouchEvent(MotionEvent event) {

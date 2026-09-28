@@ -112,6 +112,8 @@ After synchronization, the BOOX removes cached renderings that are no longer in 
 
 Shared photo-frame behavior is kept in parity with the Kindle Voyage edition. Any intentional user-visible divergence must be approved explicitly; see [Cross-device parity](docs/CROSS_DEVICE_PARITY.md).
 
+Repository maintenance uses protected pull requests and macOS CI; see the [Chinese maintenance handover](docs/HANDOVER.zh-CN.md).
+
 ## Security model
 
 This project is designed for a trusted private LAN:

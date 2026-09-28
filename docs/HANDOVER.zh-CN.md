@@ -1,5 +1,14 @@
 # BOOX N96 相框交接手册
 
+## 2026-09-28 Git 工作流约定
+
+- `main` 是可部署和发布分支，不直接在其上开发。所有改动（包括文档）都使用短期 `fix/*`、`feat/*` 或 `chore/*` 分支，通过 PR 合并。
+- `main` 已启用分支保护：必须通过 `Project checks`，必须解决 PR 对话，禁止强推和删除；单人维护允许 0 个批准和管理员应急绕过。若为恢复设备服务而应急绕过，随后必须立即用 `hotfix/*` PR 对齐已部署的精确改动。
+- CI 固定使用 macOS 26，安装 Java 17、Android SDK Platform 36 / Build Tools 36.0.0，并运行 `git diff --check` 与完整 `./scripts/check.sh`。它验证脚本、Node/JSON、原生 Mac 工具、渲染测试、隐私扫描及可签名 Android 构建，但不能代替 BOOX N96 的墨水屏、按键、触摸、休眠唤醒、旧版 Android 网络或安装升级验收。
+- 涉及触摸、按键、显示、同步、安装、签名、更新或恢复的改动，在发布前必须完成 BOOX N96 真机验证。CI 使用临时调试密钥生成的 APK 仅用于构建验证，不作为设备部署或 Release 资产。
+- 与 Kindle 共用的行为应在两个仓库分别创建并互相链接 PR；任何有意差异记录到 `docs/CROSS_DEVICE_PARITY.md`。
+- Release 只从已合并、检查和真机验证的 `main` 创建；版本标签不可移动，并同步记录版本、检查结果、设备部署状态及实际使用的签名来源。
+
 ## 2026-09-28 发布 v1.2.4
 
 GitHub Release [`v1.2.4`](https://github.com/FrancoLan/boox-n96-photo-frame/releases/tag/v1.2.4) 已发布，Release 准备提交为 `620f4c9`。该版汇总自 `v1.2.0` 后的共享 Mac 同步与照片渲染变更：新照片优先播放、每分钟相册检查、单次 EXIF 方向归一化、完整地址和星期元数据、暗部自适应提亮。BOOX Android APK 未改动，设备端版本仍为 `1.2.2`。`./scripts/check.sh` 全部通过，包含 APK 签名校验。

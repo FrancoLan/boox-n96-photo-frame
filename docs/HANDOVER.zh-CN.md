@@ -1,5 +1,9 @@
 # BOOX N96 相框交接手册
 
+## 2026-09-28 发布 v1.2.4
+
+GitHub Release [`v1.2.4`](https://github.com/FrancoLan/boox-n96-photo-frame/releases/tag/v1.2.4) 已发布，Release 准备提交为 `620f4c9`。该版汇总自 `v1.2.0` 后的共享 Mac 同步与照片渲染变更：新照片优先播放、每分钟相册检查、单次 EXIF 方向归一化、完整地址和星期元数据、暗部自适应提亮。BOOX Android APK 未改动，设备端版本仍为 `1.2.2`。`./scripts/check.sh` 全部通过，包含 APK 签名校验。
+
 ## 2026-09-27 修复照片方向回归（已验证渲染；设备清单重发待完成）
 
 此前 v9 同步器先用 `sips -r` 按 EXIF 旋转像素，而元数据渲染器的 ImageIO 解码又启用了 EXIF transform，造成部分竖图被旋转两次。现统一为 ImageIO 在 `metadata-overlay` 中单次归一化，移除同步器的额外旋转，并将缓存版本升至 `voyage-1072x1448-gray-face-edge-fill-weekday-two-line-shadow-adaptive-orientation-once-v10`。EXIF Orientation 6 与 8 的两张本地实拍已在修复版下成功渲染为 1072×1448；两仓库 `./scripts/check.sh` 均通过，并新增防双重旋转检查。Mac 正式运行目录已部署 v10 渲染器并保留回滚备份。正式同步现已发布 44 张，manifest `ebb68e6254cfa084`；BOOX `sync` 命令 `86941956-1e7b-41e4-8c36-7c46db6b9a16` 成功回执、cache=44。Kindle `restart` 命令 `86bf61c0-c7fd-4fab-a23a-5edf97829942` 已发出，但设备心跳在 2026-09-26 14:41:22 UTC 后中断，局域网 ping 无响应，尚不能确认 Kindle 已拉取 v10。GitHub 修复提交 `9dd97ee` 已推送至 BOOX 仓库 `main`。

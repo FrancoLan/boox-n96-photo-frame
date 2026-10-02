@@ -2,9 +2,11 @@ package io.github.francolan.booxphotoframe;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.BatteryManager;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -27,7 +29,7 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 public final class ControlService extends Service {
-    private static final String VERSION = "1.2.2";
+    private static final String VERSION = "1.2.5";
     private static final long POLL_MS = 60000L;
     private static final long HEARTBEAT_MS = 300000L;
     private static final int MAX_COMMAND_BYTES = 16 * 1024;
@@ -177,7 +179,7 @@ public final class ControlService extends Service {
         String report = "collectedAt=" + System.currentTimeMillis() + "\n"
                 + "device=boox-n96\nmodel=" + Build.MODEL + "\nrelease=" + Build.VERSION.RELEASE + "\nsdk=" + Build.VERSION.SDK_INT + "\n"
                 + "appVersion=" + VERSION + "\nappState=" + appState() + "\nuptimeMs=" + SystemClock.elapsedRealtime() + "\n"
-                + "cacheFiles=" + cacheCount() + "\nfreeBytes=" + rootDir.getFreeSpace() + "\ntotalBytes=" + rootDir.getTotalSpace() + "\n";
+                + batteryDetails(true) + "cacheFiles=" + cacheCount() + "\nfreeBytes=" + rootDir.getFreeSpace() + "\ntotalBytes=" + rootDir.getTotalSpace() + "\n";
         gzip.write(report.getBytes("UTF-8"));
         gzip.finish();
         gzip.close();
@@ -186,13 +188,43 @@ public final class ControlService extends Service {
 
     private void postStatus(String server, String token, String id, String action, String result, String detail) throws Exception {
         String clean = String.valueOf(detail).replace('\t', ' ').replace('\r', ' ').replace('\n', ' ');
-        if (clean.length() > 180) clean = clean.substring(0, 180);
+        if (clean.length() > 100) clean = clean.substring(0, 100);
         String body = "# boox-photoframe-status-v1\n"
                 + "device\tboox-n96\n"
                 + (id.length() == 0 ? "" : "commandId\t" + id + "\n")
                 + "action\t" + action + "\nresult\t" + result + "\nappState\t" + appState() + "\n"
-                + "appVersion\t" + VERSION + "\ndetail\t" + clean + "; cache=" + cacheCount() + "\n";
+                + "appVersion\t" + VERSION + "\ndetail\t" + clean + "; cache=" + cacheCount() + "; " + batteryDetails(false) + "\n";
         Http.post(server + "/v1/boox/control/status", token, "text/tab-separated-values; charset=utf-8", body.getBytes("UTF-8"), 1024);
+    }
+
+    // ACTION_BATTERY_CHANGED is sticky and available on the N96's API 15.
+    // A null receiver reads the current snapshot without a persistent listener.
+    private String batteryDetails(boolean diagnostic) {
+        try {
+            Intent battery = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            if (battery == null) return diagnostic ? "batteryAvailable=false\n" : "battery=unknown";
+            int level = battery.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = battery.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            String percent = level >= 0 && scale > 0 && level <= scale
+                    ? String.valueOf((int) (100L * level / scale)) : "unknown";
+            int status = battery.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
+            int plugged = battery.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+            String state = "unknown";
+            switch (status) {
+                case BatteryManager.BATTERY_STATUS_CHARGING: state = "charging"; break;
+                case BatteryManager.BATTERY_STATUS_DISCHARGING: state = "discharging"; break;
+                case BatteryManager.BATTERY_STATUS_NOT_CHARGING: state = "not-charging"; break;
+                case BatteryManager.BATTERY_STATUS_FULL: state = "full"; break;
+            }
+            if (!diagnostic) return "battery=" + percent + "; power=" + state + "; plugged=" + plugged;
+            return "batteryAvailable=true\nbatteryPercent=" + percent
+                    + "\nbatteryLevel=" + level + "\nbatteryScale=" + scale
+                    + "\nbatteryStatus=" + state + "\nbatteryPlugged=" + plugged
+                    + "\nbatteryTemperatureTenthsC=" + battery.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
+                    + "\nbatteryVoltageMv=" + battery.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1) + "\n";
+        } catch (RuntimeException unavailable) {
+            return diagnostic ? "batteryAvailable=false\n" : "battery=unknown";
+        }
     }
 
     private String appState() { return MainActivity.isVisible() ? "running" : "stopped"; }

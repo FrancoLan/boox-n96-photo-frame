@@ -5,3 +5,7 @@ server/config.local.json
 server/metadata-overlay
 server/reverse-geocode
 *.log
+
+*.jsonl
+implementation/mac/charge-config.local.json
+implementation/mac/charge-config.json

@@ -16,7 +16,8 @@ javac -encoding UTF-8 -source 7 -target 7 -Xlint:-options \
     -classpath "$ANDROID_JAR" -d "$CLASSES_DIR" \
     "$SCRIPT_DIR/src/io/github/francolan/booxphotoframe/MainActivity.java" \
     "$SCRIPT_DIR/src/io/github/francolan/booxphotoframe/BootReceiver.java" \
-    "$SCRIPT_DIR/src/io/github/francolan/booxphotoframe/ControlService.java"
+    "$SCRIPT_DIR/src/io/github/francolan/booxphotoframe/ControlService.java" \
+    "$SCRIPT_DIR/src/io/github/francolan/booxphotoframe/ServerFallback.java"
 
 jar cf "$BUILD_DIR/classes.jar" -C "$CLASSES_DIR" .
 "$BUILD_TOOLS/d8" --min-api 15 --lib "$ANDROID_JAR" --output "$BUILD_DIR/dex" "$BUILD_DIR/classes.jar"

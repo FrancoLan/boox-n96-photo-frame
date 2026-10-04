@@ -265,7 +265,10 @@ public final class MainActivity extends Activity {
         if (server == null || token == null || !token.matches("[a-f0-9]{64}")) {
             throw new Exception("Missing or invalid " + new File(rootDir, "config.properties"));
         }
-        while (server.endsWith("/")) server = server.substring(0, server.length() - 1);
+        final String probeToken = token;
+        server = ServerFallback.choose(server, config.get("server_fallback_url"), new ServerFallback.Probe() {
+            public void check(String endpoint) throws Exception { request(endpoint + "/v1/manifest", probeToken, MAX_MANIFEST_BYTES); }
+        });
         byte[] manifestBytes = request(server + "/v1/manifest", token, MAX_MANIFEST_BYTES);
         String manifest = new String(manifestBytes, "UTF-8");
         String[] lines = manifest.split("\\r?\\n");

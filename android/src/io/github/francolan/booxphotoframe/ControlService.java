@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 public final class ControlService extends Service {
-    private static final String VERSION = "1.2.5";
+    private static final String VERSION = "1.2.6";
     private static final long POLL_MS = 60000L;
     private static final long HEARTBEAT_MS = 300000L;
     private static final int MAX_COMMAND_BYTES = 16 * 1024;
@@ -66,7 +66,13 @@ public final class ControlService extends Service {
             if (server != null && token != null && token.matches("[a-f0-9]{64}")) {
                 while (server.endsWith("/")) server = server.substring(0, server.length() - 1);
                 boolean commandHandled = false;
-                try { commandHandled = pollCommand(server, token); }
+                try {
+                    final String probeToken = token;
+                    server = ServerFallback.choose(server, config.get("server_fallback_url"), new ServerFallback.Probe() {
+                        public void check(String endpoint) throws Exception { Http.get(endpoint + "/v1/manifest", probeToken, 64 * 1024); }
+                    });
+                    commandHandled = pollCommand(server, token);
+                }
                 catch (Exception error) { android.util.Log.w("BooxControl", "Command poll failed", error); }
                 long now = System.currentTimeMillis();
                 if (commandHandled) lastHeartbeat = now;

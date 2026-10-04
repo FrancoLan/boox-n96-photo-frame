@@ -20,3 +20,7 @@ Hardware differences must not silently change the user-visible result. Any inten
 ## Confirmed refresh behavior (2026-09-28)
 
 The user specifically requested BOOX full-screen refresh on each photo change, matching its physical Settings key. BOOX APK 1.2.3 requests the N96 firmware's full refresh about 100 ms after drawing the photo, and also when resuming the frame. The user verified the matching flash and removal of ghosting on the device. Kindle retains its previously requested 10-second deferred full refresh after quick manual navigation; this BOOX-specific change does not alter the Kindle player. Photo processing, ordering, synchronization, and slideshow intervals remain shared.
+
+## Battery charging control (2026-10-04)
+
+Both devices share the Mac controller maintained in FrancoLan/kindle-voyage-photo-frame, with strict 40/80 thresholds, independent HomeKit plugs and private logs. BOOX uses existing battery telemetry; Kindle adds a manager battery-status helper. See the Kindle repository's docs/CHARGING.md for setup and recovery requirements.

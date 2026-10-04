@@ -137,3 +137,9 @@ Mac 端 `server/reverse-geocode.swift` 已迁移到 `MKMapItem.addressRepresenta
 - 服务端的 `data/server-token` 与设备配置必须一致；更换令牌后需重新运行安装脚本。
 - 公开 GitHub 前必须确保本地配置、令牌、缓存、日志、诊断和签名密钥均未被跟踪。
 - Kindle Voyage 与 BOOX 的共享相框功能默认同步更新；如果受硬件限制或产品选择影响需要出现用户可见差异，必须先单独取得用户确认并记录到 `CROSS_DEVICE_PARITY.md`。
+
+## 2026-10-04 HomeKit 电量充电控制
+
+两台设备共用 Mac 控制器：低于 40% 打开对应充电插座，高于 80% 关闭，40–80% 保持。BOOX 使用现有 Android 电池回报；Kindle 增加无线管理电量回报。控制器代码和使用说明位于 Kindle 仓库 docs/CHARGING.md，本次无需更改 BOOX APK。
+
+四条开关通过设备电源回报实测；修复子进程输入 EOF 后，后台与锁屏关闭通过。每台独立保存私人 JSONL，记录命令成功/失败、充电变化和五分钟采样。原始日志和本机配置不上传仓库。Mac 必须开机、登录、联网，使用重启后仍可达的服务地址。当前地址持久化仍需操作员完成；不创建 Release。

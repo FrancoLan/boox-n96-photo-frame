@@ -112,7 +112,7 @@ After synchronization, the BOOX removes cached renderings that are no longer in 
 
 Shared photo-frame behavior is kept in parity with the Kindle Voyage edition. Any intentional user-visible divergence must be approved explicitly; see [Cross-device parity](docs/CROSS_DEVICE_PARITY.md).
 
-Repository maintenance uses protected pull requests and macOS CI; see the [Chinese maintenance handover](docs/HANDOVER.zh-CN.md).
+Repository maintenance uses protected pull requests and macOS CI; see the [maintenance handover](docs/HANDOVER.md).
 
 ## Security model
 
@@ -130,7 +130,7 @@ The local HTTP transport is not encrypted. Do not port-forward it to the interne
 - `android/`: API-15-compatible Android client and reproducible build script.
 - `server/`: iCloud synchronization, renderer, authenticated server, and control CLI.
 - `scripts/`: build, install, synchronization, server, and management wrappers.
-- `docs/HANDOVER.zh-CN.md`: operational handover and recovery guide.
+- `docs/HANDOVER.md`: operational handover and recovery guide.
 - `docs/PROTOCOL.md`: manifest and wireless-control protocol.
 
 Before a public commit, run `./scripts/check.sh`. It validates shell, Node, JSON, native Mac helpers, the Android APK, and common private-value patterns.

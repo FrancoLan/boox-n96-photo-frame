@@ -1,6 +1,6 @@
 # BOOX N96 maintenance handover
 
-Updated 2026-10-08. This records the last verified deployment; query fresh device reports for live status. Earlier investigations remain in Git history. Private deployment records are not published.
+Updated 2026-10-09. This records the last verified deployment; query fresh device reports for live status. Earlier investigations remain in Git history. Private deployment records are not published.
 
 ## Current release and remaining checks
 
@@ -40,3 +40,11 @@ While USB storage is exported, Android's sdcard can become unreadable. After mod
 - Maintain shared behavior through linked Kindle PRs and obtain approval for new user-visible differences. The shared server, charging logs and interface binding are included in [Kindle v0.4.11](https://github.com/FrancoLan/kindle-voyage-photo-frame/releases/tag/v0.4.11).
 - Publish only code, tests, sanitized documentation and verified release assets. Actual network configuration, album links, photos, tokens, diagnostics, battery logs, full device identifiers and private keys stay local. Never modify iCloud originals.
 - Keep GitHub documentation, PR titles/descriptions and release notes in English. Update current sections directly; preserve detailed history in Git or private records instead of appending conflicting current-state summaries.
+
+## Shared Mac battery alerts
+
+[Kindle v0.4.12](https://github.com/FrancoLan/kindle-voyage-photo-frame/releases/tag/v0.4.12) adds an independent read-only battery monitor for both clients. It alerts after fifteen minutes without valid telemetry or forty-five minutes of fresh charging samples without a two-point increase. Separate private logs record alerts and recoveries, with repeated active issues deduplicated for six hours. macOS notification settings and Focus may suppress display. The existing 40/80 charging thresholds are unchanged.
+
+The same update adds optional household-presence gating and a brightness floor for the Kindle frontlight. The ordinary N96 has no frontlight, so no equivalent BOOX light control is added. BOOX Android remains version 1.2.6 / code 12; no new APK installation is needed.
+
+After installing or updating a Mac runtime, complete any incoming-network permission prompt and verify real LAN requests. In device testing, an apparent runtime failure disappeared after the user allowed the new executable's incoming connections; do not assume all builds of a Node major version are broken. Keep private battery diagnostics and household occupancy records out of GitHub.
